@@ -1,5 +1,5 @@
 const dns = require("dns");
-dns.setDefaultResultOrder("ipv4first"); // 🔑 Fuerza IPv4
+dns.setDefaultResultOrder("ipv4first");
 
 const express = require("express");
 const cors = require("cors");
@@ -8,7 +8,10 @@ const { Pool } = require("pg");
 
 dotenv.config();
 
-//console.log("DATABASE_URL:", process.env.DATABASE_URL); // Verifica que se cargue bien
+// === DEPURACIÓN ===
+console.log("DATABASE_URL:", process.env.DATABASE_URL);
+console.log("Todas las variables de entorno:", Object.keys(process.env));
+// === FIN DEPURACIÓN ===
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -16,23 +19,15 @@ const port = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// Configuración del pool con timeout y SSL
-/* const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false },
-  connectionTimeoutMillis: 10000, // 10 segundos de espera
-}); */
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false },
 });
 
-// Endpoint de prueba
 app.get("/api/health", (req, res) => {
   res.json({ status: "OK", message: "Hola desde Railway" });
 });
 
-// Endpoint que prueba la base de datos
 app.get("/api/db-test", async (req, res) => {
   try {
     const result = await pool.query("SELECT NOW() as current_time");
