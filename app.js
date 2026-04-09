@@ -12,12 +12,14 @@ if (process.env.NODE_ENV !== "production") {
 
 // === DEPURACIÓN (puedes eliminar después) ===
 console.log("NODE_ENV:", process.env.NODE_ENV);
-console.log("DB_HOST:", process.env.DB_HOST);
-console.log("DB_PORT:", process.env.DB_PORT);
-console.log("DB_USER:", process.env.DB_USER);
-console.log("DB_DATABASE:", process.env.DB_DATABASE);
-// No imprimir la contraseña por seguridad, pero puedes verificar si existe:
-console.log("DB_PASSWORD definida:", !!process.env.DB_PASSWORD);
+console.log("DATABASE_URL definida?:", !!process.env.DATABASE_URL);
+// Muestra los primeros 30 caracteres para depurar (sin mostrar la contraseña completa)
+if (process.env.DATABASE_URL) {
+  console.log(
+    "DATABASE_URL (inicio):",
+    process.env.DATABASE_URL.substring(0, 30),
+  );
+}
 // === FIN DEPURACIÓN ===
 
 const app = express();
@@ -26,15 +28,11 @@ const port = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// Configuración del pool usando variables separadas
+// Configuración del pool usando connectionString (más simple y robusto)
 const pool = new Pool({
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_DATABASE,
+  connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false },
-  connectionTimeoutMillis: 10000, // opcional, 10 segundos
+  connectionTimeoutMillis: 10000, // 10 segundos
 });
 
 // Endpoint de prueba
